@@ -5,6 +5,7 @@ import StreakBanner from './StreakBanner'
 import GoalsBar from './GoalsBar'
 import BadgeToast from './BadgeToast'
 import FinalTally from './FinalTally'
+import SoundToggle from './SoundToggle'
 import type { SpellSettings, FallingLetter, GamePhase, WordScorePopup, FlyingLetterAnim, CaptureParticle, SwipeTrail, LetterDestroyAnim } from '../types'
 import { getSpawnIntervalMs } from '../dropSpeed'
 import {
@@ -786,6 +787,7 @@ export default function GameScreen({ words, settings, onBack }: Props) {
         <button type="button" className="game__back" onClick={onBack} aria-label="Back to setup">
           ←
         </button>
+        <SoundToggle />
         <div className="game__hud-body">
           <div className="game__hud-top">
             <span className="game__hud-word">{wordIndex + 1}/{words.length}</span>

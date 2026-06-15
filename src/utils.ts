@@ -97,49 +97,72 @@ export function countTotalLetters(words: string[]): number {
   return words.reduce((sum, w) => sum + w.length, 0)
 }
 
-export function playSound(type: 'correct' | 'wrong' | 'complete' | 'pop') {
+type SoundType = 'correct' | 'wrong' | 'complete' | 'pop'
+
+const SOUND_STORAGE_KEY = 'ninjaboom-sound'
+
+const SOUND_FILES: Record<SoundType, string> = {
+  pop: 'hwa.mp3',
+  correct: 'hoowar.mp3',
+  wrong: 'hw-hw.mp3',
+  complete: 'ooowar.mp3',
+}
+
+const soundCache = new Map<SoundType, HTMLAudioElement>()
+type SoundListener = () => void
+const soundListeners = new Set<SoundListener>()
+
+function loadSoundEnabled(): boolean {
   try {
-    const ctx = new AudioContext()
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.connect(gain)
-    gain.connect(ctx.destination)
+    const raw = localStorage.getItem(SOUND_STORAGE_KEY)
+    if (raw === null) return true
+    return raw === 'true'
+  } catch {
+    return true
+  }
+}
 
-    const now = ctx.currentTime
-    gain.gain.setValueAtTime(0.15, now)
+let soundEnabled = loadSoundEnabled()
 
-    if (type === 'correct') {
-      osc.frequency.setValueAtTime(523, now)
-      osc.frequency.exponentialRampToValueAtTime(784, now + 0.1)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2)
-      osc.start(now)
-      osc.stop(now + 0.2)
-    } else if (type === 'wrong') {
-      osc.type = 'sawtooth'
-      osc.frequency.setValueAtTime(200, now)
-      osc.frequency.exponentialRampToValueAtTime(100, now + 0.15)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2)
-      osc.start(now)
-      osc.stop(now + 0.2)
-    } else if (type === 'complete') {
-      ;[523, 659, 784, 1047].forEach((freq, i) => {
-        const o = ctx.createOscillator()
-        const g = ctx.createGain()
-        o.connect(g)
-        g.connect(ctx.destination)
-        const t = now + i * 0.12
-        o.frequency.setValueAtTime(freq, t)
-        g.gain.setValueAtTime(0.12, t)
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.25)
-        o.start(t)
-        o.stop(t + 0.25)
-      })
-    } else {
-      osc.frequency.setValueAtTime(440, now)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08)
-      osc.start(now)
-      osc.stop(now + 0.08)
-    }
+export function isSoundEnabled(): boolean {
+  return soundEnabled
+}
+
+export function setSoundEnabled(enabled: boolean) {
+  if (soundEnabled === enabled) return
+  soundEnabled = enabled
+  try {
+    localStorage.setItem(SOUND_STORAGE_KEY, String(enabled))
+  } catch {
+    // Storage not available
+  }
+  soundListeners.forEach((listener) => listener())
+}
+
+export function toggleSoundEnabled() {
+  setSoundEnabled(!soundEnabled)
+}
+
+export function subscribeSound(listener: SoundListener): () => void {
+  soundListeners.add(listener)
+  return () => soundListeners.delete(listener)
+}
+
+function getSoundClip(type: SoundType): HTMLAudioElement {
+  let clip = soundCache.get(type)
+  if (!clip) {
+    clip = new Audio(`${import.meta.env.BASE_URL}sounds/${SOUND_FILES[type]}`)
+    soundCache.set(type, clip)
+  }
+  return clip
+}
+
+export function playSound(type: SoundType) {
+  if (!soundEnabled) return
+  try {
+    const clip = getSoundClip(type).cloneNode() as HTMLAudioElement
+    clip.volume = type === 'pop' ? 0.45 : 0.75
+    void clip.play()
   } catch {
     // Audio not available
   }

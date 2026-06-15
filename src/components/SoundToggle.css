@@ -1,0 +1,38 @@
+.sound-toggle {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--white);
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s;
+}
+
+.sound-toggle:hover {
+  background: rgba(124, 58, 237, 0.3);
+}
+
+.sound-toggle--off {
+  color: var(--white-dim);
+  opacity: 0.82;
+}
+
+.sound-toggle--off:hover {
+  opacity: 1;
+}
+
+.sound-toggle__icon {
+  width: 1.45rem;
+  height: 1.45rem;
+}
+
+.setup__sound-toggle {
+  position: absolute;
+  top: 0.15rem;
+  right: 0;
+  z-index: 4;
+}

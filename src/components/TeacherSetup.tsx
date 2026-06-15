@@ -8,6 +8,7 @@ import type { DropSpeed, GameMode, GameSettings, MathDuration, SpellSettings, Ma
 import GameIcon from './GameIcon'
 import GameLogo from './GameLogo'
 import SetupBadgeShelf from './SetupBadgeShelf'
+import SoundToggle from './SoundToggle'
 import './TeacherSetup.css'
 
 const SAMPLE_LISTS: Record<string, string> = {
@@ -108,6 +109,7 @@ export default function TeacherSetup({ onStart, initialSettings }: Props) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
+        <SoundToggle className="setup__sound-toggle" />
         <h1 className="setup__title">
           <GameLogo size="hero" />
         </h1>

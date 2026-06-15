@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   base: '/ninjaboom/',
   server: {
-    port: 5173,
+    port: 5176,
     strictPort: true,
     open: '/ninjaboom/',
   },

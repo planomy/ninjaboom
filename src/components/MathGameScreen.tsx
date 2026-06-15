@@ -4,6 +4,7 @@ import StreakBanner from './StreakBanner'
 import GoalsBar from './GoalsBar'
 import BadgeToast from './BadgeToast'
 import FinalTally from './FinalTally'
+import SoundToggle from './SoundToggle'
 import type {
   MathSettings,
   FallingLetter,
@@ -681,6 +682,7 @@ export default function MathGameScreen({ settings, onBack }: Props) {
         <button type="button" className="game__back" onClick={onBack} aria-label="Back to setup">
           ←
         </button>
+        <SoundToggle />
         <div className="game__hud-body">
           <div className="game__hud-top">
             <div className="game__math-timer game__math-timer--inline">
