@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { parseWordList } from '../utils'
+import { parseWordList, playSound } from '../utils'
 import { loadProgress, BADGES, UPGRADES } from '../progression'
 import { DROP_SPEED_OPTIONS } from '../dropSpeed'
 import { MODE_ICONS, SETUP_ICONS } from '../icons'
@@ -62,6 +62,12 @@ export default function TeacherSetup({ onStart, initialSettings }: Props) {
   const canStartSpell = parsedWords.length > 0
   const canStartMath = selectedTables.length > 0
 
+  function handleModeChange(nextMode: GameMode) {
+    if (nextMode === mode) return
+    setMode(nextMode)
+    playSound('mode')
+  }
+
   function handleStart() {
     if (mode === 'spell') {
       if (!canStartSpell) return
@@ -120,7 +126,7 @@ export default function TeacherSetup({ onStart, initialSettings }: Props) {
               role="tab"
               aria-selected={mode === 'spell'}
               className={`setup__mode-tab ${mode === 'spell' ? 'setup__mode-tab--active' : ''}`}
-              onClick={() => setMode('spell')}
+              onClick={() => handleModeChange('spell')}
             >
               <GameIcon src={MODE_ICONS.spell} alt="" size="sm" className="setup__mode-icon" />
               <span className="setup__mode-copy">
@@ -133,7 +139,7 @@ export default function TeacherSetup({ onStart, initialSettings }: Props) {
               role="tab"
               aria-selected={mode === 'math'}
               className={`setup__mode-tab ${mode === 'math' ? 'setup__mode-tab--active' : ''}`}
-              onClick={() => setMode('math')}
+              onClick={() => handleModeChange('math')}
             >
               <GameIcon src={MODE_ICONS.math} alt="" size="sm" className="setup__mode-icon" />
               <span className="setup__mode-copy">

@@ -97,7 +97,7 @@ export function countTotalLetters(words: string[]): number {
   return words.reduce((sum, w) => sum + w.length, 0)
 }
 
-type SoundType = 'correct' | 'wrong' | 'complete' | 'pop'
+type SoundType = 'correct' | 'wrong' | 'complete' | 'pop' | 'mode'
 
 const SOUND_STORAGE_KEY = 'ninjaboom-sound'
 
@@ -106,6 +106,7 @@ const SOUND_FILES: Record<SoundType, string> = {
   correct: 'hoowar.mp3',
   wrong: 'hw-hw.mp3',
   complete: 'ooowar.mp3',
+  mode: 'ninjaboom.mp3',
 }
 
 const soundCache = new Map<SoundType, HTMLAudioElement>()
@@ -161,7 +162,7 @@ export function playSound(type: SoundType) {
   if (!soundEnabled) return
   try {
     const clip = getSoundClip(type).cloneNode() as HTMLAudioElement
-    clip.volume = type === 'pop' ? 0.45 : 0.75
+    clip.volume = type === 'pop' ? 0.45 : type === 'mode' ? 0.7 : 0.75
     void clip.play()
   } catch {
     // Audio not available
