@@ -190,7 +190,6 @@ export default function MathGameScreen({ settings, onBack }: Props) {
   }
 
   function penalizeWrongAnswer() {
-    playSound('wrong')
     setWrongFlash(true)
     window.setTimeout(() => setWrongFlash(false), 350)
     const stats = recordWrongHit(sessionStatsRef.current)
@@ -201,7 +200,6 @@ export default function MathGameScreen({ settings, onBack }: Props) {
   }
 
   function penalizeRandomSwipe() {
-    playSound('wrong')
     setWrongFlash(true)
     window.setTimeout(() => setWrongFlash(false), 350)
     const stats = recordWrongHit(sessionStatsRef.current)
@@ -245,7 +243,6 @@ export default function MathGameScreen({ settings, onBack }: Props) {
       gameStateRef.current = { ...gameStateRef.current, phase: 'playing', fallingLetters: burst }
       setFallingLetters(burst)
       setPhase('playing')
-      playSound('pop')
       return
     }
     const timer = window.setTimeout(() => setCountdown((c) => c - 1), 1000)
@@ -496,7 +493,7 @@ export default function MathGameScreen({ settings, onBack }: Props) {
       return false
     }
 
-    playSound('correct')
+    playSound(ninja ? 'swipe' : 'tap')
     const captureResult = recordCorrectCapture(sessionStatsRef.current, ninja, activeUpgrades)
     sessionStatsRef.current = captureResult.stats
     setSessionStats(captureResult.stats)

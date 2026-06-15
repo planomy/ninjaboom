@@ -182,7 +182,6 @@ export default function GameScreen({ words, settings, onBack }: Props) {
     setBonusPopup(null)
     showSlotsMessage(`−${WRONG_LETTER_PENALTY} wrong letter`, 'penalty')
     setWrongFlash(true)
-    playSound('wrong')
     window.setTimeout(() => setWrongFlash(false), 400)
   }
 
@@ -193,7 +192,6 @@ export default function GameScreen({ words, settings, onBack }: Props) {
     applyScorePenalty(RANDOM_SWIPE_PENALTY)
     showSlotsMessage(`−${RANDOM_SWIPE_PENALTY} wild swipe`, 'penalty')
     setWrongFlash(true)
-    playSound('wrong')
     window.setTimeout(() => setWrongFlash(false), 400)
   }
 
@@ -311,7 +309,6 @@ export default function GameScreen({ words, settings, onBack }: Props) {
       }
       setFallingLetters(burst)
       setPhase('playing')
-      playSound('pop')
       return
     }
 
@@ -603,7 +600,7 @@ export default function GameScreen({ words, settings, onBack }: Props) {
       return false
     }
 
-    playSound('correct')
+    playSound(ninja ? 'swipe' : 'tap')
 
     const captureResult = recordCorrectCapture(sessionStatsRef.current, ninja, activeUpgrades)
     sessionStatsRef.current = captureResult.stats

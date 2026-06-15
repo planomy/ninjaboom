@@ -97,21 +97,19 @@ export function countTotalLetters(words: string[]): number {
   return words.reduce((sum, w) => sum + w.length, 0)
 }
 
-type SoundType = 'correct' | 'wrong' | 'complete' | 'pop' | 'mode'
+type SoundType = 'tap' | 'swipe' | 'complete' | 'mode'
 
 const SOUND_STORAGE_KEY = 'ninjaboom-sound'
 
-const SOUND_FILES: Record<SoundType, string> = {
-  pop: 'hwa.mp3',
-  correct: 'hoowar.mp3',
-  wrong: 'hw-hw.mp3',
-  complete: 'ooowar.mp3',
-  mode: 'ninjaboom.mp3',
-}
+const SWIPE_FILES = ['hwo1.mp3', 'hwi1.mp3'] as const
+const COMPLETE_FILES = ['hoowar.mp3', 'hoooowar.mp3'] as const
 
-const soundCache = new Map<SoundType, HTMLAudioElement>()
+const soundCache = new Map<string, HTMLAudioElement>()
 type SoundListener = () => void
 const soundListeners = new Set<SoundListener>()
+
+let swipeAlt = 0
+let completeAlt = 0
 
 function loadSoundEnabled(): boolean {
   try {
@@ -149,11 +147,30 @@ export function subscribeSound(listener: SoundListener): () => void {
   return () => soundListeners.delete(listener)
 }
 
-function getSoundClip(type: SoundType): HTMLAudioElement {
-  let clip = soundCache.get(type)
+function soundFileFor(type: SoundType): string {
+  switch (type) {
+    case 'tap':
+      return 'hiya.mp3'
+    case 'swipe': {
+      const file = SWIPE_FILES[swipeAlt % SWIPE_FILES.length]
+      swipeAlt += 1
+      return file
+    }
+    case 'complete': {
+      const file = COMPLETE_FILES[completeAlt % COMPLETE_FILES.length]
+      completeAlt += 1
+      return file
+    }
+    case 'mode':
+      return 'ninjaboom.mp3'
+  }
+}
+
+function getSoundClip(file: string): HTMLAudioElement {
+  let clip = soundCache.get(file)
   if (!clip) {
-    clip = new Audio(`${import.meta.env.BASE_URL}sounds/${SOUND_FILES[type]}`)
-    soundCache.set(type, clip)
+    clip = new Audio(`${import.meta.env.BASE_URL}sounds/${file}`)
+    soundCache.set(file, clip)
   }
   return clip
 }
@@ -161,8 +178,9 @@ function getSoundClip(type: SoundType): HTMLAudioElement {
 export function playSound(type: SoundType) {
   if (!soundEnabled) return
   try {
-    const clip = getSoundClip(type).cloneNode() as HTMLAudioElement
-    clip.volume = type === 'pop' ? 0.45 : type === 'mode' ? 0.7 : 0.75
+    const file = soundFileFor(type)
+    const clip = getSoundClip(file).cloneNode() as HTMLAudioElement
+    clip.volume = type === 'mode' ? 0.7 : 0.75
     void clip.play()
   } catch {
     // Audio not available
