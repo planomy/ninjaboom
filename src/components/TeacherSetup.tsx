@@ -276,8 +276,10 @@ export default function TeacherSetup({ onStart, onStartSpellingTest, initialSett
                     type="button"
                     className="setup__sample-btn"
                     onClick={() => loadSample(key)}
+                    aria-label={key}
+                    title={key}
                   >
-                    {key}
+                    {key.replace('Grade ', 'Gr')}
                   </button>
                 ))}
                 <button
