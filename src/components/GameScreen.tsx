@@ -40,6 +40,7 @@ const WRONG_LETTER_PENALTY = 10
 const RANDOM_SWIPE_PENALTY = 15
 const WORD_HINT_PENALTY = 25
 const WORD_HINT_SECONDS = 1.5
+const LETTER_FLIGHT_SECONDS = 0.3
 
 interface SwipeGesture {
   active: boolean
@@ -474,6 +475,59 @@ export default function GameScreen({ words, settings, onBack }: Props) {
     setFlyingLetter(flying)
   }
 
+  function ensureRequiredLetterAvailable(word: string, nextIndex: number) {
+    const requiredChar = word[nextIndex]
+    if (!requiredChar) return
+
+    const width = gameAreaRef.current?.clientWidth ?? 600
+    const height = gameAreaRef.current?.clientHeight ?? 500
+    const visibleBottom = Math.max(100, height - 72)
+
+    setFallingLetters((prev) => {
+      const alreadyAvailable = prev.some(
+        (letter) => letter.char === requiredChar && letter.y >= 0 && letter.y <= visibleBottom,
+      )
+      if (alreadyAvailable) return prev
+
+      const spawned = createSpawnedLetter(word, nextIndex, width, settings.dropSpeed)
+      const guaranteedLetter: FallingLetter = {
+        ...spawned,
+        id: `${requiredChar}-required-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        char: requiredChar,
+        y: 20 + Math.random() * Math.min(70, Math.max(30, height * 0.12)),
+      }
+
+      let next: FallingLetter[]
+      if (prev.length < MAX_FALLING_LETTERS) {
+        next = [...prev, guaranteedLetter]
+      } else {
+        let replaceIndex = -1
+        let lowestY = -Infinity
+
+        prev.forEach((letter, index) => {
+          if (letter.char !== requiredChar && letter.y > lowestY) {
+            replaceIndex = index
+            lowestY = letter.y
+          }
+        })
+
+        if (replaceIndex < 0) {
+          replaceIndex = prev.reduce(
+            (lowestIndex, letter, index) =>
+              letter.y > prev[lowestIndex].y ? index : lowestIndex,
+            0,
+          )
+        }
+
+        next = prev.map((letter, index) => (index === replaceIndex ? guaranteedLetter : letter))
+      }
+
+      fallingLettersRef.current = next
+      gameStateRef.current.fallingLetters = next
+      return next
+    })
+  }
+
   function completeLetterPlacement(char: string) {
     const curIdx = gameStateRef.current.letterIndex
     const word = gameStateRef.current.currentWord
@@ -530,6 +584,7 @@ export default function GameScreen({ words, settings, onBack }: Props) {
     } else {
       gameStateRef.current.letterIndex = nextIndex
       setLetterIndex(nextIndex)
+      ensureRequiredLetterAvailable(word, nextIndex)
     }
   }
 
@@ -1159,7 +1214,7 @@ export default function GameScreen({ words, settings, onBack }: Props) {
                 rotate: [0, -20, 0],
               }}
               transition={{
-                duration: 0.72,
+                duration: LETTER_FLIGHT_SECONDS,
                 times: [0, 0.38, 1],
                 ease: ['easeOut', 'easeInOut'],
               }}
