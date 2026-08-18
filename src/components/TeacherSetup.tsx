@@ -270,36 +270,40 @@ export default function TeacherSetup({ onStart, onStartSpellingTest, initialSett
 
               <div className="setup__samples">
                 <span className="setup__samples-label">Quick load:</span>
-                {Object.keys(SAMPLE_LISTS).map((key) => (
-                  <button
-                    key={key}
-                    type="button"
-                    className="setup__sample-btn"
-                    onClick={() => loadSample(key)}
-                    aria-label={key}
-                    title={key}
-                  >
-                    {key.replace('Grade ', 'Gr')}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  className="setup__sample-btn setup__sample-btn--personal"
-                  onClick={loadMisspeltWords}
-                  disabled={spellingProgress.misspeltWords.length === 0}
-                  title={spellingProgress.misspeltWords.length === 0 ? 'Complete a word check first' : 'Load all of your misspelt words'}
-                >
-                  My Misspelt Words ({spellingProgress.misspeltWords.length})
-                </button>
-                {spellingProgress.misspeltWords.length > 10 && (
+                <div className="setup__sample-grades">
+                  {Object.keys(SAMPLE_LISTS).map((key) => (
+                    <button
+                      key={key}
+                      type="button"
+                      className="setup__sample-btn"
+                      onClick={() => loadSample(key)}
+                      aria-label={key}
+                      title={key}
+                    >
+                      {key.replace('Grade ', 'Gr')}
+                    </button>
+                  ))}
+                </div>
+                <div className="setup__sample-personal">
                   <button
                     type="button"
-                    className="setup__sample-btn setup__sample-btn--pick"
-                    onClick={loadTenMisspeltWords}
+                    className="setup__sample-btn setup__sample-btn--personal"
+                    onClick={loadMisspeltWords}
+                    disabled={spellingProgress.misspeltWords.length === 0}
+                    title={spellingProgress.misspeltWords.length === 0 ? 'Complete a word check first' : 'Load all of your misspelt words'}
                   >
-                    Pick 10 for me
+                    My Misspelt Words ({spellingProgress.misspeltWords.length})
                   </button>
-                )}
+                  {spellingProgress.misspeltWords.length > 10 && (
+                    <button
+                      type="button"
+                      className="setup__sample-btn setup__sample-btn--pick"
+                      onClick={loadTenMisspeltWords}
+                    >
+                      Pick 10 for me
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="setup__preview-row">

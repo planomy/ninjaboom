@@ -211,24 +211,53 @@
   box-shadow: 0 0 28px rgba(124, 58, 237, 0.35);
 }
 
+.spelling-test__results {
+  width: min(100%, 720px);
+  gap: 0.6rem;
+  padding: 1rem 1.25rem;
+}
+
+.spelling-test__results .spelling-test__score,
+.spelling-test__results .spelling-test__complete-mark {
+  width: 5rem;
+  height: 5rem;
+}
+
+.spelling-test__results .spelling-test__score {
+  font-size: 1.75rem;
+}
+
+.spelling-test__results .spelling-test__complete-mark {
+  font-size: 2.5rem;
+}
+
+.spelling-test__results h1 {
+  font-size: clamp(1.8rem, 4.8vw, 2.5rem);
+  line-height: 0.98;
+}
+
+.spelling-test__results .spelling-test__instruction {
+  line-height: 1.3;
+}
+
 .spelling-test__missed-list {
   width: 100%;
-  max-height: 12rem;
-  overflow-y: auto;
   display: grid;
-  gap: 0.45rem;
-  padding-right: 0.25rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem 0.5rem;
 }
 
 .spelling-test__missed-item {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  gap: 0.65rem;
+  gap: 0.4rem;
   align-items: center;
-  padding: 0.65rem 0.8rem;
+  min-width: 0;
+  padding: 0.42rem 0.55rem;
   border-radius: 12px;
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.2);
+  font-size: 0.92rem;
 }
 
 .spelling-test__missed-item span:first-child {
@@ -247,6 +276,13 @@
   display: grid;
   grid-template-columns: 1fr 1.2fr;
   gap: 0.65rem;
+}
+
+.spelling-test__results .spelling-test__submit,
+.spelling-test__results .spelling-test__secondary {
+  min-height: 3.2rem;
+  padding: 0.65rem 1rem;
+  font-size: 1.1rem;
 }
 
 .spelling-test__secondary {
@@ -282,12 +318,31 @@
     display: none;
   }
 
-  .spelling-test__listen-row,
-  .spelling-test__result-actions {
+  .spelling-test__listen-row {
     grid-template-columns: 1fr;
   }
 
   .spelling-test__card {
     margin-block: 0;
+  }
+
+  .spelling-test__results {
+    padding: 0.9rem;
+  }
+
+  .spelling-test__missed-list {
+    gap: 0.3rem;
+  }
+
+  .spelling-test__missed-item {
+    gap: 0.25rem;
+    padding: 0.38rem 0.42rem;
+    font-size: 0.8rem;
+  }
+
+  .spelling-test__results .spelling-test__submit,
+  .spelling-test__results .spelling-test__secondary {
+    padding-inline: 0.55rem;
+    font-size: 0.9rem;
   }
 }
