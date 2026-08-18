@@ -4,15 +4,18 @@ import GameLogo from './GameLogo'
 import {
   DIAGNOSTIC_BATCH_SIZE,
   DIAGNOSTIC_WORDS,
+  getMisspeltDiagnosticWords,
   getNextDiagnosticWords,
   loadSpellingDiagnostic,
   normaliseSpellingAnswer,
   recordDiagnosticAnswer,
   type DiagnosticWord,
+  type SpellingTestMode,
 } from '../spellingDiagnostic'
 import './SpellingTest.css'
 
 interface Props {
+  mode: SpellingTestMode
   onBack: () => void
 }
 
@@ -42,9 +45,18 @@ function wordPrompt(item: DiagnosticWord) {
   speak(`${item.word}. ${item.sentence} ${item.word}.`)
 }
 
-export default function SpellingTest({ onBack }: Props) {
-  const initialWords = useMemo(() => getNextDiagnosticWords(), [])
+export default function SpellingTest({ mode, onBack }: Props) {
+  const initialPool = useMemo(
+    () => mode === 'retest' ? getMisspeltDiagnosticWords() : getNextDiagnosticWords(),
+    [mode],
+  )
+  const initialWords = initialPool.slice(0, DIAGNOSTIC_BATCH_SIZE)
   const [words, setWords] = useState(initialWords)
+  const [retestQueue, setRetestQueue] = useState(
+    mode === 'retest' ? initialPool.slice(DIAGNOSTIC_BATCH_SIZE) : [],
+  )
+  const [retestedCount, setRetestedCount] = useState(0)
+  const [retestTotal] = useState(initialPool.length)
   const [phase, setPhase] = useState<TestPhase>(initialWords.length > 0 ? 'testing' : 'complete')
   const [wordIndex, setWordIndex] = useState(0)
   const [answer, setAnswer] = useState('')
@@ -54,13 +66,20 @@ export default function SpellingTest({ onBack }: Props) {
   const currentWord = words[wordIndex]
   const progress = loadSpellingDiagnostic()
   const testedBeforeBatch = Math.max(0, progress.testedWords.length - results.length)
-  const checkedCount = phase === 'testing'
-    ? Math.min(DIAGNOSTIC_WORDS.length, testedBeforeBatch + wordIndex)
-    : progress.testedWords.length
-  const progressPercent = Math.round((checkedCount / DIAGNOSTIC_WORDS.length) * 100)
+  const checkedCount = mode === 'retest'
+    ? retestedCount
+    : phase === 'testing'
+      ? Math.min(DIAGNOSTIC_WORDS.length, testedBeforeBatch + wordIndex)
+      : progress.testedWords.length
+  const progressTotal = mode === 'retest' ? retestTotal : DIAGNOSTIC_WORDS.length
+  const progressPercent = progressTotal > 0
+    ? Math.round((checkedCount / progressTotal) * 100)
+    : 0
   const correctCount = results.filter((result) => result.isCorrect).length
   const missedResults = results.filter((result) => !result.isCorrect)
-  const remainingCount = Math.max(0, DIAGNOSTIC_WORDS.length - progress.testedWords.length)
+  const remainingCount = mode === 'retest'
+    ? retestQueue.length
+    : Math.max(0, DIAGNOSTIC_WORDS.length - progress.testedWords.length)
 
   useEffect(() => {
     if (phase !== 'testing' || !currentWord) return
@@ -83,6 +102,7 @@ export default function SpellingTest({ onBack }: Props) {
       { word: currentWord.word, answer: cleanAnswer, isCorrect },
     ]
     recordDiagnosticAnswer(currentWord.word, isCorrect)
+    if (mode === 'retest') setRetestedCount((count) => count + 1)
     setResults(nextResults)
     setAnswer('')
 
@@ -95,6 +115,21 @@ export default function SpellingTest({ onBack }: Props) {
   }
 
   function startNextBatch() {
+    if (mode === 'retest') {
+      const nextWords = retestQueue.slice(0, DIAGNOSTIC_BATCH_SIZE)
+      if (nextWords.length === 0) {
+        setPhase('complete')
+        return
+      }
+      setRetestQueue((queue) => queue.slice(DIAGNOSTIC_BATCH_SIZE))
+      setWords(nextWords)
+      setResults([])
+      setWordIndex(0)
+      setAnswer('')
+      setPhase('testing')
+      return
+    }
+
     const nextWords = getNextDiagnosticWords()
     if (nextWords.length === 0) {
       setPhase('complete')
@@ -119,10 +154,10 @@ export default function SpellingTest({ onBack }: Props) {
         </span>
       </header>
 
-      <div className="spelling-test__progress" aria-label={`${checkedCount} of ${DIAGNOSTIC_WORDS.length} words checked`}>
+      <div className="spelling-test__progress" aria-label={`${checkedCount} of ${progressTotal} words checked`}>
         <div className="spelling-test__progress-copy">
-          <span>Word check progress</span>
-          <strong>{checkedCount}/{DIAGNOSTIC_WORDS.length}</strong>
+          <span>{mode === 'retest' ? 'Retest progress' : 'Word check progress'}</span>
+          <strong>{checkedCount}/{progressTotal}</strong>
         </div>
         <div className="spelling-test__progress-track">
           <motion.div
@@ -140,7 +175,9 @@ export default function SpellingTest({ onBack }: Props) {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="spelling-test__eyebrow">SPELLING TEST MODE</div>
+          <div className="spelling-test__eyebrow">
+            {mode === 'retest' ? 'RETEST MY LIST WORDS' : 'SPELLING TEST MODE'}
+          </div>
           <h1>Word {wordIndex + 1} of {words.length}</h1>
           <p className="spelling-test__instruction">Listen, then type the word. It will not appear on screen.</p>
 
@@ -201,11 +238,23 @@ export default function SpellingTest({ onBack }: Props) {
         >
           <div className="spelling-test__eyebrow">BATCH COMPLETE</div>
           <div className="spelling-test__score">{correctCount}/{results.length}</div>
-          <h1>{missedResults.length === 0 ? 'Perfect ninja work!' : 'Your list words are saved'}</h1>
+          <h1>
+            {mode === 'retest'
+              ? correctCount === results.length
+                ? 'Words mastered!'
+                : correctCount > 0
+                  ? 'Some words mastered!'
+                  : 'Keep practising!'
+              : missedResults.length === 0
+                ? 'Perfect ninja work!'
+                : 'Your list words are saved'}
+          </h1>
           <p className="spelling-test__instruction">
-            {missedResults.length === 0
-              ? 'You nailed every word in this set.'
-              : `${missedResults.length} ${missedResults.length === 1 ? 'word has' : 'words have'} been added to My Misspelt Words.`}
+            {mode === 'retest'
+              ? `${correctCount} ${correctCount === 1 ? 'word has' : 'words have'} been removed from My Misspelt Words. ${progress.misspeltWords.length} ${progress.misspeltWords.length === 1 ? 'word remains' : 'words remain'} saved.`
+              : missedResults.length === 0
+                ? 'You nailed every word in this set.'
+                : `${missedResults.length} ${missedResults.length === 1 ? 'word has' : 'words have'} been added to My Misspelt Words.`}
           </p>
 
           {missedResults.length > 0 && (
@@ -239,11 +288,15 @@ export default function SpellingTest({ onBack }: Props) {
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
         >
-          <div className="spelling-test__eyebrow">WORD CHECK COMPLETE</div>
+          <div className="spelling-test__eyebrow">
+            {mode === 'retest' ? 'RETEST COMPLETE' : 'WORD CHECK COMPLETE'}
+          </div>
           <div className="spelling-test__complete-mark" aria-hidden="true">✓</div>
-          <h1>You checked every word!</h1>
+          <h1>{mode === 'retest' ? 'No words to retest!' : 'You checked every word!'}</h1>
           <p className="spelling-test__instruction">
-            You now have {progress.misspeltWords.length} personalised list {progress.misspeltWords.length === 1 ? 'word' : 'words'} ready for Ninja Boom games.
+            {mode === 'retest'
+              ? 'Your misspelt word list is clear. Brilliant work!'
+              : `You now have ${progress.misspeltWords.length} personalised list ${progress.misspeltWords.length === 1 ? 'word' : 'words'} ready for Ninja Boom games.`}
           </p>
           <button type="button" className="spelling-test__submit" onClick={onBack}>
             Make a game

@@ -8,6 +8,8 @@ export interface SpellingDiagnosticProgress {
   misspeltWords: string[]
 }
 
+export type SpellingTestMode = 'diagnostic' | 'retest'
+
 export const DIAGNOSTIC_BATCH_SIZE = 10
 
 // A single, grade-free check of useful school words. The order moves broadly
@@ -177,7 +179,7 @@ export function recordDiagnosticAnswer(word: string, isCorrect: boolean): Spelli
   const cleanWord = normaliseWord(word)
   const testedWords = [...new Set([...progress.testedWords, cleanWord])]
   const misspeltWords = isCorrect
-    ? progress.misspeltWords
+    ? progress.misspeltWords.filter((savedWord) => savedWord !== cleanWord)
     : [...new Set([...progress.misspeltWords, cleanWord])]
   const updated = normaliseProgress({ testedWords, misspeltWords })
   saveSpellingDiagnostic(updated)
@@ -187,6 +189,11 @@ export function recordDiagnosticAnswer(word: string, isCorrect: boolean): Spelli
 export function getNextDiagnosticWords(limit = DIAGNOSTIC_BATCH_SIZE): DiagnosticWord[] {
   const tested = new Set(loadSpellingDiagnostic().testedWords)
   return DIAGNOSTIC_WORDS.filter((item) => !tested.has(item.word.toLowerCase())).slice(0, limit)
+}
+
+export function getMisspeltDiagnosticWords(): DiagnosticWord[] {
+  const misspelt = new Set(loadSpellingDiagnostic().misspeltWords)
+  return DIAGNOSTIC_WORDS.filter((item) => misspelt.has(item.word.toLowerCase()))
 }
 
 export function pickMisspeltWords(limit = DIAGNOSTIC_BATCH_SIZE): string[] {

@@ -200,6 +200,18 @@
   box-shadow: 0 6px 18px rgba(124, 58, 237, 0.32);
 }
 
+.setup__test-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.setup__test-btn--retest {
+  color: #dcfce7;
+  background: linear-gradient(180deg, #34d399, #16a34a 55%, #166534);
+  box-shadow: 0 6px 18px rgba(34, 197, 94, 0.24);
+}
+
 .setup__word-input {
   width: 100%;
   background: rgba(12, 8, 28, 0.65);
@@ -592,6 +604,10 @@
   }
 
   .setup__test-btn {
+    width: 100%;
+  }
+
+  .setup__test-actions {
     width: 100%;
   }
 }

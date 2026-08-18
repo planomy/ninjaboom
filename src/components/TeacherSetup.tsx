@@ -8,6 +8,7 @@ import {
   DIAGNOSTIC_WORDS,
   loadSpellingDiagnostic,
   pickMisspeltWords,
+  type SpellingTestMode,
 } from '../spellingDiagnostic'
 import type { DropSpeed, GameMode, GameSettings, MathDuration, SpellSettings, MathSettings } from '../types'
 import GameIcon from './GameIcon'
@@ -41,7 +42,7 @@ const DURATION_OPTIONS: { value: MathDuration; label: string }[] = [
 
 interface Props {
   onStart: (words: string[], settings: GameSettings) => void
-  onStartSpellingTest: () => void
+  onStartSpellingTest: (mode: SpellingTestMode) => void
   initialSettings: GameSettings
 }
 
@@ -238,17 +239,28 @@ export default function TeacherSetup({ onStart, onStartSpellingTest, initialSett
                     {spellingProgress.misspeltWords.length} misspelt saved
                   </span>
                 </div>
-                <button
-                  type="button"
-                  className="setup__test-btn"
-                  onClick={onStartSpellingTest}
-                >
-                  {spellingProgress.testedWords.length === 0
-                    ? 'START WORD CHECK'
-                    : spellingProgress.testedWords.length < DIAGNOSTIC_WORDS.length
-                      ? 'CONTINUE TEST'
-                      : 'VIEW RESULTS'}
-                </button>
+                <div className="setup__test-actions">
+                  <button
+                    type="button"
+                    className="setup__test-btn"
+                    onClick={() => onStartSpellingTest('diagnostic')}
+                  >
+                    {spellingProgress.testedWords.length === 0
+                      ? 'START WORD CHECK'
+                      : spellingProgress.testedWords.length < DIAGNOSTIC_WORDS.length
+                        ? 'CONTINUE TEST'
+                        : 'VIEW RESULTS'}
+                  </button>
+                  {spellingProgress.misspeltWords.length > 0 && (
+                    <button
+                      type="button"
+                      className="setup__test-btn setup__test-btn--retest"
+                      onClick={() => onStartSpellingTest('retest')}
+                    >
+                      RETEST LIST WORDS
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="setup__section">
