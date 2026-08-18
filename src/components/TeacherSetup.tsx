@@ -4,6 +4,11 @@ import { parseWordList, playSound } from '../utils'
 import { loadProgress, BADGES, UPGRADES } from '../progression'
 import { DROP_SPEED_OPTIONS } from '../dropSpeed'
 import { MODE_ICONS, SETUP_ICONS } from '../icons'
+import {
+  DIAGNOSTIC_WORDS,
+  loadSpellingDiagnostic,
+  pickMisspeltWords,
+} from '../spellingDiagnostic'
 import type { DropSpeed, GameMode, GameSettings, MathDuration, SpellSettings, MathSettings } from '../types'
 import GameIcon from './GameIcon'
 import GameLogo from './GameLogo'
@@ -36,6 +41,7 @@ const DURATION_OPTIONS: { value: MathDuration; label: string }[] = [
 
 interface Props {
   onStart: (words: string[], settings: GameSettings) => void
+  onStartSpellingTest: () => void
   initialSettings: GameSettings
 }
 
@@ -43,7 +49,7 @@ function defaultDropSpeed(settings: GameSettings): DropSpeed {
   return settings.dropSpeed ?? 'normal'
 }
 
-export default function TeacherSetup({ onStart, initialSettings }: Props) {
+export default function TeacherSetup({ onStart, onStartSpellingTest, initialSettings }: Props) {
   const [mode, setMode] = useState<GameMode>(initialSettings.mode)
   const [wordInput, setWordInput] = useState('')
   const [previewSeconds, setPreviewSeconds] = useState(
@@ -59,6 +65,7 @@ export default function TeacherSetup({ onStart, initialSettings }: Props) {
 
   const parsedWords = parseWordList(wordInput)
   const progress = loadProgress()
+  const spellingProgress = loadSpellingDiagnostic()
   const canStartSpell = parsedWords.length > 0
   const canStartMath = selectedTables.length > 0
 
@@ -82,6 +89,14 @@ export default function TeacherSetup({ onStart, initialSettings }: Props) {
 
   function loadSample(key: string) {
     setWordInput(SAMPLE_LISTS[key])
+  }
+
+  function loadMisspeltWords() {
+    setWordInput(spellingProgress.misspeltWords.join(', '))
+  }
+
+  function loadTenMisspeltWords() {
+    setWordInput(pickMisspeltWords().join(', '))
   }
 
   function toggleTable(n: number) {
@@ -210,6 +225,32 @@ export default function TeacherSetup({ onStart, initialSettings }: Props) {
               exit={{ opacity: 0, x: 12 }}
               transition={{ duration: 0.25 }}
             >
+              <div className="setup__test-card">
+                <div className="setup__test-copy">
+                  <span className="setup__test-kicker">TESTING MODE</span>
+                  <strong>Find your list words</strong>
+                  <span>
+                    Hear 10 school words at a time. Any you miss are saved for your own Ninja games.
+                  </span>
+                  <span className="setup__test-progress">
+                    {spellingProgress.testedWords.length}/{DIAGNOSTIC_WORDS.length} checked
+                    <b>•</b>
+                    {spellingProgress.misspeltWords.length} misspelt saved
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="setup__test-btn"
+                  onClick={onStartSpellingTest}
+                >
+                  {spellingProgress.testedWords.length === 0
+                    ? 'START WORD CHECK'
+                    : spellingProgress.testedWords.length < DIAGNOSTIC_WORDS.length
+                      ? 'CONTINUE TEST'
+                      : 'VIEW RESULTS'}
+                </button>
+              </div>
+
               <div className="setup__section">
                 <label className="setup__label" htmlFor="words">
                   Word List
@@ -239,6 +280,24 @@ export default function TeacherSetup({ onStart, initialSettings }: Props) {
                     {key}
                   </button>
                 ))}
+                <button
+                  type="button"
+                  className="setup__sample-btn setup__sample-btn--personal"
+                  onClick={loadMisspeltWords}
+                  disabled={spellingProgress.misspeltWords.length === 0}
+                  title={spellingProgress.misspeltWords.length === 0 ? 'Complete a word check first' : 'Load all of your misspelt words'}
+                >
+                  My Misspelt Words ({spellingProgress.misspeltWords.length})
+                </button>
+                {spellingProgress.misspeltWords.length > 10 && (
+                  <button
+                    type="button"
+                    className="setup__sample-btn setup__sample-btn--pick"
+                    onClick={loadTenMisspeltWords}
+                  >
+                    Pick 10 for me
+                  </button>
+                )}
               </div>
 
               <div className="setup__preview-row">

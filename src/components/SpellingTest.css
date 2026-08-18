@@ -1,0 +1,293 @@
+.spelling-test {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+  background:
+    radial-gradient(circle at 50% 25%, rgba(124, 58, 237, 0.2), transparent 38%),
+    var(--black-soft);
+}
+
+.spelling-test__header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.spelling-test__header .game-logo {
+  height: 4rem;
+  width: auto;
+}
+
+.spelling-test__back,
+.spelling-test__saved {
+  justify-self: start;
+  padding: 0.5rem 0.8rem;
+  border-radius: 12px;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  background: rgba(124, 58, 237, 0.13);
+  color: var(--purple-light);
+  font-weight: 700;
+}
+
+.spelling-test__saved {
+  justify-self: end;
+  color: var(--white-dim);
+  font-size: 0.86rem;
+}
+
+.spelling-test__progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.spelling-test__progress-copy {
+  display: flex;
+  justify-content: space-between;
+  color: var(--white-dim);
+  font-size: 0.85rem;
+}
+
+.spelling-test__progress-copy strong {
+  color: var(--purple-light);
+}
+
+.spelling-test__progress-track {
+  height: 0.6rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(167, 139, 250, 0.18);
+}
+
+.spelling-test__progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--purple), #c4b5fd);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.55);
+}
+
+.spelling-test__card {
+  width: min(100%, 620px);
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: clamp(1.2rem, 4vw, 2.2rem);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(42, 25, 82, 0.96), rgba(22, 13, 48, 0.97));
+  border: 1px solid rgba(167, 139, 250, 0.32);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35), inset 0 1px rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.spelling-test__eyebrow {
+  color: var(--purple-light);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.spelling-test__card h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.spelling-test__instruction {
+  max-width: 31rem;
+  color: var(--white-dim);
+  line-height: 1.45;
+}
+
+.spelling-test__listen-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 0.65rem;
+}
+
+.spelling-test__listen {
+  min-height: 4rem;
+  padding: 0.8rem 1rem;
+  border-radius: 15px;
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  background: rgba(124, 58, 237, 0.15);
+  color: var(--purple-light);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.spelling-test__listen--primary {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.82), rgba(91, 33, 182, 0.92));
+  color: var(--white);
+  box-shadow: 0 8px 22px rgba(124, 58, 237, 0.28);
+}
+
+.spelling-test__speaker {
+  display: inline-block;
+  margin-right: 0.45rem;
+  font-family: monospace;
+  letter-spacing: -0.16em;
+}
+
+.spelling-test__form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  text-align: left;
+}
+
+.spelling-test__form label {
+  color: var(--white);
+  font-weight: 700;
+}
+
+.spelling-test__form input {
+  width: 100%;
+  padding: 1rem 1.1rem;
+  border-radius: 15px;
+  border: 2px solid rgba(167, 139, 250, 0.35);
+  outline: none;
+  background: rgba(9, 5, 24, 0.65);
+  color: var(--white);
+  font-size: 1.25rem;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+.spelling-test__form input:focus {
+  border-color: var(--purple-light);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+.spelling-test__form input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.spelling-test__help {
+  color: var(--white-dim);
+  font-size: 0.76rem;
+  text-align: center;
+}
+
+.spelling-test__submit,
+.spelling-test__secondary {
+  min-height: 3.65rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 15px;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: 0.08em;
+  color: var(--white);
+  background: linear-gradient(180deg, #9b6dff, var(--purple) 48%, var(--purple-deep));
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 7px 22px rgba(124, 58, 237, 0.32);
+}
+
+.spelling-test__submit:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.spelling-test__score {
+  width: 7rem;
+  height: 7rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  background: rgba(124, 58, 237, 0.25);
+  border: 3px solid var(--purple-light);
+  box-shadow: 0 0 28px rgba(124, 58, 237, 0.35);
+}
+
+.spelling-test__missed-list {
+  width: 100%;
+  max-height: 12rem;
+  overflow-y: auto;
+  display: grid;
+  gap: 0.45rem;
+  padding-right: 0.25rem;
+}
+
+.spelling-test__missed-item {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.65rem 0.8rem;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.spelling-test__missed-item span:first-child {
+  color: #fca5a5;
+  text-decoration: line-through;
+  text-align: right;
+}
+
+.spelling-test__missed-item strong {
+  color: #bbf7d0;
+  text-align: left;
+}
+
+.spelling-test__result-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 0.65rem;
+}
+
+.spelling-test__secondary {
+  background: rgba(124, 58, 237, 0.12);
+  color: var(--purple-light);
+  box-shadow: none;
+  border-color: rgba(167, 139, 250, 0.3);
+}
+
+.spelling-test__complete-mark {
+  width: 7rem;
+  height: 7rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.16);
+  border: 3px solid var(--success);
+  color: #86efac;
+  font-size: 3.5rem;
+  font-weight: 800;
+}
+
+@media (max-width: 520px) {
+  .spelling-test {
+    padding: 1rem;
+  }
+
+  .spelling-test__header {
+    grid-template-columns: 1fr auto;
+  }
+
+  .spelling-test__header .game-logo {
+    display: none;
+  }
+
+  .spelling-test__listen-row,
+  .spelling-test__result-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .spelling-test__card {
+    margin-block: 0;
+  }
+}
